@@ -6,4 +6,6 @@ Server
 
 - set up virtual env
 - install dependencies from requirements.txt
-- 
+- set up db:
+    - createDB chat-app
+    - flask db upgrade
