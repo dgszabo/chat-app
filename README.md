@@ -6,3 +6,4 @@ Server
 
 - set up virtual env
 - install dependencies from requirements.txt
+- 
