@@ -19,13 +19,13 @@ socketio = SocketIO(app)
 from . import models
 from project.models import User, Message
 
-@app.route('/')
-def root():
-    return redirect('http://www.google.com')
-
 @app.route('/login', methods = ['POST'])
 def login():
     pass
+    # may need flask-login for this
+    # may have to add rolled auth wrapper instead of @login_required to the socketio routes
+    # read in the username from the form sent by JS
+    # if not in DB, add to DB, otherwise read from DB
 
 @app.route('/messages')
 def messages_index():
@@ -41,6 +41,21 @@ def messages_index():
     messages = Message.query.offset(offset).limit(10)
     result = { 'data': { 'messages': [{ 'id': msg.id, 'content': msg.content, 'date': msg.created } for msg in messages ]}}
     return jsonify(result)
+
+@socketio.on('connect')
+def handle_connect():
+    pass
+
+@socketio.on('post_message')
+def handle_message():
+    pass
+    # if a message comes in & it is from a valid user
+    # query the db for the userId and write the msg in the db 
+    # broadcast the message to all the users connected to the socket server
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    pass
 
 if __name__ == '__main__':
     socketio.run(app)
