@@ -32,14 +32,14 @@ def messages_index():
     if('only_new' in request.args and request.args['only_new'] == 'true'):
         last_login_time = User.query.get(1).last_login
         messages = Message.query.filter(Message.created > last_login_time)
-        result = { 'data': { 'messages': [{ 'id': msg.id, 'content': msg.content, 'date': msg.created } for msg in messages ]}}
+        result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': msg.created } for msg in messages ]}}
         return jsonify(result)
     
     offset = 0
     if('offset' in request.args and request.args['offset'] != '0'):
         offset = int(request.args['offset'])
     messages = Message.query.offset(offset).limit(10)
-    result = { 'data': { 'messages': [{ 'id': msg.id, 'content': msg.content, 'date': msg.created } for msg in messages ]}}
+    result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': msg.created } for msg in messages ]}}
     return jsonify(result)
 
 @socketio.on('connect')
