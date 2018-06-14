@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request, redirect
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, send, emit
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
@@ -44,7 +44,15 @@ def messages_index():
 
 @socketio.on('connect')
 def handle_connect():
-    pass
+    messages = Message.query.all()
+    result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content } for msg in messages ]}}
+    emit('connected', result)
+
+@socketio.on('ping-push')
+def handle_ping():
+    messages = Message.query.limit(1)
+    result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content } for msg in messages ]}}
+    emit('message_received', result, broadcast = True)
 
 @socketio.on('post_message')
 def handle_message():

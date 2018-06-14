@@ -11,14 +11,18 @@ $(document).ready(function(){
     $("#message").val("");
   })
 
-  socket.on('messages', function(data){
-    $message = $("<li>", {
-      text: `${data.username} says ${data.message}`
-    })
-    $("#messagesContainer").append($message);
-  })
+  // socket.on('messages', function(data){
+  //   $message = $("<li>", {
+  //     text: `${data.username} says ${data.message}`
+  //   })
+  //   $("#messagesContainer").append($message);
+  // })
 
   socket.on('connected', function(result){
+    console.log(result)
+  })
+
+  socket.on('message_received', function(result){
     console.log(result)
   })
 
@@ -26,8 +30,10 @@ $(document).ready(function(){
   //   $("#chatters li[data-name=" + name +"]").remove()
   // })
 
-  // $('button').on('click', function(event) {
-  //   event.preventDefault();
-  //   console.log('you pressed ping!');
-  // });
+  $('button').on('click', function(event) {
+    event.preventDefault();
+    socket.emit('ping-push', function(){
+      console.log('you pushed ping button')
+    })
+  });
 })
