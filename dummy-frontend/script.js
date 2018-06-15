@@ -4,35 +4,77 @@ $(document).ready(function(){
   // var username = prompt("whats your name?");
   // socket.emit('join', username);
 
+  let msgCounter = 0;
+
   $("#chatForm").on('submit', function(e){
     e.preventDefault();
     var message = $("#message").val();
-    socket.emit('messages',message)
-    $("#message").val("");
+    var user = 'Jim';
+    socket.emit('message-to-back',message, user, function(){
+      $("#message").val("");
+    });
   })
-
-  // socket.on('messages', function(data){
-  //   $message = $("<li>", {
-  //     text: `${data.username} says ${data.message}`
-  //   })
-  //   $("#messagesContainer").append($message);
-  // })
 
   socket.on('connected', function(result){
-    console.log(result)
+    result.data.messages = result.data.messages.map(el => {
+      el.date = new Date(el.date);
+      return el}
+    )
+    result.data.messages.map(el => {
+      $li = $('<li>').text(`${el.author} says ${el.content} on ${el.date}`);
+      $("#messagesContainer").append($li);
+    });
+    msgCounter = result.data.messages.length;
+  });
+
+  socket.on('new-messages-to-front', function(result){
+    result.data.messages = result.data.messages.map(el => {
+      el.date = new Date(el.date);
+      return el}
+    )
+    $("#messagesContainer").html("");
+    result.data.messages.map(el => {
+      $li = $('<li>').text(`${el.author} says ${el.content} on ${el.date}`);
+      $("#messagesContainer").append($li);
+    });
+    msgCounter = result.data.messages.length;
+  });
+
+  socket.on('old-messages-to-front', function(result){
+    result.data.messages = result.data.messages.map(el => {
+      el.date = new Date(el.date);
+      return el}
+    )
+    $("#messagesContainer").html("");
+    result.data.messages.map(el => {
+      $li = $('<li>').text(`${el.author} says ${el.content} on ${el.date}`);
+      $("#messagesContainer").append($li);
+    });
+    msgCounter = result.data.messages.length;
+  });
+
+  socket.on('message-to-front', function(result){
+    result.data.messages = result.data.messages.map(el => {
+      el.date = new Date(el.date);
+      return el}
+    )
+    result.data.messages.map(el => {
+      $li = $('<li>').text(`${el.author} says ${el.content} on ${el.date}`);
+      $("#messagesContainer > ul").append($li);
+    });
+    msgCounter++;
   })
 
-  socket.on('message_received', function(result){
-    console.log(result)
-  })
-
-  // socket.on("removeChatter", function(name){
-  //   $("#chatters li[data-name=" + name +"]").remove()
-  // })
-
-  $('button').on('click', function(event) {
+  $('#only-new-btn').on('click', function(event) {
     event.preventDefault();
-    socket.emit('ping-push', function(){
+    socket.emit('messages-request', { only_new: true }, 'Jim', function(){
+      console.log('you pushed the only new button')
+    })
+  });
+  
+  $('old-msgs-btn').on('click', function(event) {
+    event.preventDefault();
+    socket.emit('message-to-back', 'Message sent to back!', function(){
       console.log('you pushed ping button')
     })
   });
