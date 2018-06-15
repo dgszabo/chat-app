@@ -51,19 +51,17 @@ def handle_connect():
 @socketio.on('messages-request')
 def handle_messages_request(req, user):
     if('only_new' in req and req['only_new'] == True):
-        from IPython import embed; embed()
         last_login_time = User.query.filter_by(username = user).first().last_login
-        messages = Message.query.filter(Message.created > last_login_time)
+        messages = Message.query.filter(Message.created > last_login_time)[::-1]
         result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': msg.created.__str__() } for msg in messages ]}}
-        from IPython import embed; embed()
         emit('new-messages-to-front', result)
-    
-    offset = 0
-    if('offset' in req and req['offset'] != '0'):
-        offset = int(req['offset'])
-    messages = Message.query.offset(offset).limit(10)[::-1]
-    result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': msg.created.__str__() } for msg in messages ]}}
-    emit('old-messages-to-front', result)
+    else:
+        offset = 0
+        if('offset' in req and req['offset'] != '0'):
+            offset = int(req['offset'])
+        messages = Message.query.order_by(Message.id.desc()).offset(offset).limit(10)
+        result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': msg.created.__str__() } for msg in messages ]}}
+        emit('old-messages-to-front', result)
 
 @socketio.on('message-to-back')
 def handle_message(msg, user):
@@ -74,13 +72,6 @@ def handle_message(msg, user):
     messages = Message.query.filter_by( user_id = user_id ).order_by( Message.id.desc() ).limit(1)
     result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': msg.created.__str__() } for msg in messages ]}}
     emit('message-to-front', result, broadcast = True)
-
-@socketio.on('post_message')
-def handle_message():
-    pass
-    # if a message comes in & it is from a valid user
-    # query the db for the userId and write the msg in the db 
-    # broadcast the message to all the users connected to the socket server
 
 @socketio.on('disconnect')
 def handle_disconnect():

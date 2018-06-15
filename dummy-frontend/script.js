@@ -40,7 +40,7 @@ $(document).ready(function(){
     msgCounter = result.data.messages.length;
   });
 
-  socket.on('old-messages-to-front', function(result){
+  socket.on('new-messages-to-front', function(result){
     result.data.messages = result.data.messages.map(el => {
       el.date = new Date(el.date);
       return el}
@@ -51,6 +51,19 @@ $(document).ready(function(){
       $("#messagesContainer").append($li);
     });
     msgCounter = result.data.messages.length;
+    console.log(msgCounter)
+  });
+
+  socket.on('old-messages-to-front', function(result){
+    result.data.messages = result.data.messages.map(el => {
+      el.date = new Date(el.date);
+      return el}
+    )
+    result.data.messages.map(el => {
+      $li = $('<li>').text(`${el.author} says ${el.content} on ${el.date}`);
+      $("#messagesContainer").prepend($li);
+    });
+    msgCounter += result.data.messages.length;
   });
 
   socket.on('message-to-front', function(result){
@@ -60,7 +73,7 @@ $(document).ready(function(){
     )
     result.data.messages.map(el => {
       $li = $('<li>').text(`${el.author} says ${el.content} on ${el.date}`);
-      $("#messagesContainer > ul").append($li);
+      $("#messagesContainer").append($li);
     });
     msgCounter++;
   })
@@ -68,14 +81,12 @@ $(document).ready(function(){
   $('#only-new-btn').on('click', function(event) {
     event.preventDefault();
     socket.emit('messages-request', { only_new: true }, 'Jim', function(){
-      console.log('you pushed the only new button')
     })
   });
   
-  $('old-msgs-btn').on('click', function(event) {
+  $('#old-msgs-btn').on('click', function(event) {
     event.preventDefault();
-    socket.emit('message-to-back', 'Message sent to back!', function(){
-      console.log('you pushed ping button')
+    socket.emit('messages-request', { offset: msgCounter }, 'Jim', function(){
     })
   });
 })
