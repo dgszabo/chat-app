@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, redirect
+from flask import Flask, jsonify, request, redirect, session
 from flask_socketio import SocketIO, send, emit
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -27,21 +27,6 @@ def login():
     # read in the username from the form sent by JS
     # if not in DB, add to DB, otherwise read from DB
 
-# @app.route('/messages')
-# def messages_index():
-#     if('only_new' in request.args and request.args['only_new'] == 'true'):
-#         last_login_time = User.query.get(1).last_login
-#         messages = Message.query.filter(Message.created > last_login_time)
-#         result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': msg.created.__str__() } for msg in messages ]}}
-#         return jsonify(result)
-    
-#     offset = 0
-#     if('offset' in request.args and request.args['offset'] != '0'):
-#         offset = int(request.args['offset'])
-#     messages = Message.query.offset(offset).limit(10)
-#     result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': msg.created.__str__() } for msg in messages ]}}
-#     return jsonify(result)
-
 @socketio.on('connect')
 def handle_connect():
     messages = Message.query.order_by( Message.id.desc() ).limit(10)[::-1]
@@ -66,7 +51,7 @@ def handle_messages_request(req, user):
 @socketio.on('message-to-back')
 def handle_message(msg, user):
     user_id = User.query.filter(User.username == user).first().id
-    new_message = Message(content = msg, user_id = user_id)
+    new_message = Message(content = msg, created = datetime.now(), user_id = user_id)
     db.session.add(new_message)
     db.session.commit()
     messages = Message.query.filter_by( user_id = user_id ).order_by( Message.id.desc() ).limit(1)

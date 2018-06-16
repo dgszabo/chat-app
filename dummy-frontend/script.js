@@ -1,9 +1,10 @@
 $(document).ready(function(){
   var socket = io.connect('http://localhost:5000');
 
-  // var username = prompt("whats your name?");
-  // socket.emit('join', username);
-
+  $('#login-btn').on('click', function() {
+    
+  });
+  
   let msgCounter = 0;
 
   $("#chatForm").on('submit', function(e){
