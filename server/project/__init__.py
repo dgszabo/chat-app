@@ -1,29 +1,36 @@
-from flask import Flask, jsonify, request, redirect, session
+from flask import Flask, session
 import functools
-from flask_socketio import SocketIO, send, emit, disconnect
+import os
+from flask_socketio import SocketIO, emit, disconnect
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://localhost/chat-app'
+if os.environ.get('ENV') == 'production':
+    app.config['DEBUG'] = False
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+    app.config['SQLALCHEMY_ECHO'] = False
+else:
+    app.config['DEBUG'] = True
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://localhost/chat-app'
+    app.config['SQLALCHEMY_ECHO'] = True
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ECHO'] = True
-app.config['SECRET_KEY'] = 'temporary dev key'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'temporary dev key'
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-
 socketio = SocketIO(app)
 
-from . import models
 from project.models import User, Message
+
 
 def logged_in_only(func):
     @functools.wraps(func)
     def wrapped(*args, **kwargs):
-        if not 'username' in session:
+        if 'username' not in session:
             disconnect()
         else:
             return func(*args, **kwargs)
@@ -87,15 +94,19 @@ def handle_message(req):
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    user = User.query.get(session['user_id'])
-    user.last_login = datetime.now()
-    db.session.add(user)
-    db.session.commit()
-    session.clear()
+    try:
+        user = User.query.get(session['user_id'])
+        user.last_login = datetime.now()
+        db.session.add(user)
+        db.session.commit()
+        session.clear()
+    except:
+        print('ERROR: No user was logged in when disconnecting.')
 
 @socketio.on_error_default
 def default_error_handler(error):
     print(f'The following error occured:\n{error}')
+
 
 if __name__ == '__main__':
     socketio.run(app)
