@@ -9,3 +9,11 @@ Server
 - set up db:
     - createDB chat-app
     - flask db upgrade
+
+- to start server:
+    - export FLASK_APP=app.py
+    - flask run
+
+Frontend
+========
+
