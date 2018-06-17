@@ -5,8 +5,8 @@ $(document).ready(function(){
 
   $("#loginForm").on('submit', function(e){
     e.preventDefault();
-    var user = $("#username").val();
-    socket.emit('login', user, function(){
+    let username = $("#username").val();
+    socket.emit('login', { username }, function(){
       $("#username").val("");
     });
   })
@@ -14,28 +14,16 @@ $(document).ready(function(){
   $("#chatForm").on('submit', function(e){
     e.preventDefault();
     var message = $("#message").val();
-    var user = 'Jim';
-    socket.emit('message-to-back',message, user, function(){
+    socket.emit('message-to-back', { message }, function(){
       $("#message").val("");
     });
   })
 
-  // socket.on('connected', function(result){
-  //   result.data.messages = result.data.messages.map(el => {
-  //     el.date = new Date(el.date);
-  //     return el}
-  //   )
-  //   result.data.messages.map(el => {
-  //     $li = $('<li>').text(`${el.author} says ${el.content} on ${el.date}`);
-  //     $("#messagesContainer").append($li);
-  //   });
-  //   msgCounter = result.data.messages.length;
-  // });
-
   socket.on('logged-in', function(result) {
     username = result.data.username;
     console.log(username)
-    socket.emit('messages-request', { offset: msgCounter }, 'Jim')
+    $("#messagesContainer").html("");
+    socket.emit('messages-request', { offset: msgCounter })
   });
 
   socket.on('new-messages-to-front', function(result){
@@ -62,6 +50,7 @@ $(document).ready(function(){
       $("#messagesContainer").prepend($li);
     });
     msgCounter += result.data.messages.length;
+    console.log(msgCounter);
   });
 
   socket.on('message-to-front', function(result){
@@ -76,15 +65,19 @@ $(document).ready(function(){
     msgCounter++;
   })
 
+  socket.on('disconnect', function() {
+    $("#messagesContainer").html("<p>You are disconnected</p>");
+  })
+
   $('#only-new-btn').on('click', function(event) {
     event.preventDefault();
-    socket.emit('messages-request', { only_new: true }, 'Jim', function(){
+    socket.emit('messages-request', { only_new: true }, function(){
     })
   });
   
   $('#old-msgs-btn').on('click', function(event) {
     event.preventDefault();
-    socket.emit('messages-request', { offset: msgCounter }, 'Jim', function(){
+    socket.emit('messages-request', { offset: msgCounter }, function(){
     })
   });
 })
