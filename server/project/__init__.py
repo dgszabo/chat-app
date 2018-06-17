@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request, redirect, session
-from flask_socketio import SocketIO, send, emit
+import functools
+from flask_socketio import SocketIO, send, emit, disconnect
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
@@ -19,6 +20,15 @@ socketio = SocketIO(app)
 from . import models
 from project.models import User, Message
 
+def logged_in_only(func):
+    @functools.wraps(func)
+    def wrapped(*args, **kwargs):
+        if not 'username' in session:
+            disconnect()
+        else:
+            return func(*args, **kwargs)
+    return wrapped
+
 @socketio.on('login')
 def handle_login(req):
     user = User.query.filter(User.username == req['username']).first()
@@ -33,6 +43,7 @@ def handle_login(req):
     emit('logged-in', result)
 
 @socketio.on('messages-request')
+@logged_in_only
 def handle_messages_request(req):
     if('only_new' in req and req['only_new'] == True):
         last_login_time = User.query.get(session['user_id']).last_login
@@ -48,6 +59,7 @@ def handle_messages_request(req):
         emit('old-messages-to-front', result)
 
 @socketio.on('message-to-back')
+@logged_in_only
 def handle_message(req):
     new_message = Message(content = req['message'], created = datetime.now(), user_id = session['user_id'])
     db.session.add(new_message)
