@@ -25,8 +25,8 @@ class SendMessageTab extends Component {
     return (
       <div className='container sendMessageTab px-0 mx-auto'>
         <div className='btn-group'>
-          <button type='button' className='btn btn-info'>show only new messages</button>
-          <button type='button' className='btn btn-secondary'>show message history</button>
+          <button type='button' className='btn btn-info' onClick={this.props.getNewMessages}>show only new messages</button>
+          <button type='button' className='btn btn-secondary' onClick={this.props.getOldMessages}>show message history</button>
         </div>
         <form className='sendMessageForm' onSubmit={this.handleSendMessage.bind(this)}>
           <input type='text' name='newMessage' id='newMessage' value={this.state.newMessage} onChange={this.handleChange.bind(this)} required/>

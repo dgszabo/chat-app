@@ -41,7 +41,7 @@ class App extends Component {
           username: result.data.username,
         });
         console.log('I emitted a request for messages')
-        this.socket.emit('messages-request', { offset: this.state.msgCounter })
+        this.socket.emit('messages-request', { offset: this.state.messages.length })
       } else {
         console.log(`An error has occured: ${result.error.message}`);
       }
@@ -53,7 +53,7 @@ class App extends Component {
         return el}
       ).reverse();
       this.setState(prevState => {
-        return { messages: [ ...prevState.messages, ...messages ] }
+        return { messages: [ ...messages, ...prevState.messages ] }
       });
       console.log(this.state.messages);
     });
@@ -89,11 +89,19 @@ class App extends Component {
     this.socket.emit('message-to-back', { message: msgObj.newMessage });
   }
 
+  getNewMessages() {
+    this.socket.emit('messages-request', { only_new: true });
+  }
+  
+  getOldMessages() {
+    this.socket.emit('messages-request', { offset: this.state.messages.length });
+  }
+
   render() {
     let renderLoginOrChatWindow = () => {
       if(this.state.loggedIn) {
         return (
-          <ChatWindow messages={this.state.messages} sendMessage={this.sendMessage.bind(this)} />
+          <ChatWindow messages={this.state.messages} sendMessage={this.sendMessage.bind(this)} getNewMessages={this.getNewMessages.bind(this)} getOldMessages={this.getOldMessages.bind(this)} />
         )
       } else {
         return (
