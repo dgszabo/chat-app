@@ -5,7 +5,7 @@ import SendMessageTab from './SendMessageTab';
 class ChatWindow extends Component {
   render () {
     return (
-      <div>
+      <div className='container'>
         <h1>This is the chat window!</h1>
         <MessagesTab />
         <SendMessageTab />

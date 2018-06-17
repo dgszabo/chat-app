@@ -50,8 +50,7 @@ class App extends Component {
     }
     
     return (
-      <div className="App">
-        <p>This is the app file</p>
+      <div className='App'>
         {renderDisconnectedOrChatWindow()}
       </div>
     );
