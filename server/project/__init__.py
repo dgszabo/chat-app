@@ -31,42 +31,59 @@ def logged_in_only(func):
 
 @socketio.on('login')
 def handle_login(req):
-    user = User.query.filter(User.username == req['username']).first()
-    if(not user):
-        new_user = User(username = req['username'])
-        db.session.add(new_user)
-        db.session.commit()
+    try:
         user = User.query.filter(User.username == req['username']).first()
-    session['user_id'] = user.id
-    session['username'] = user.username
-    result = { 'data': { 'username': session['username'] } }
-    emit('logged-in', result)
+        if(not user):
+            new_user = User(username = req['username'])
+            db.session.add(new_user)
+            db.session.commit()
+            user = User.query.filter(User.username == req['username']).first()
+        session['user_id'] = user.id
+        session['username'] = user.username
+        result = { 'data': { 'username': session['username'] } }
+        emit('logged-in', result)
+    except:
+        result = { 'error': { 'type': 'login error', 'message': 'Something went wrong with logging you in to the chat app. Try reloading the webpage and logging in later!' } }
+        emit('logged-in', result)
 
 @socketio.on('messages-request')
 @logged_in_only
 def handle_messages_request(req):
+    
     if('only_new' in req and req['only_new'] == True):
-        last_login_time = User.query.get(session['user_id']).last_login
-        messages = Message.query.filter(Message.created > last_login_time)
-        result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': msg.created.__str__() } for msg in messages ]}}
-        emit('new-messages-to-front', result)
+        try:
+            last_login_time = User.query.get(session['user_id']).last_login
+            messages = Message.query.filter(Message.created > last_login_time)
+            result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': msg.created.__str__() } for msg in messages ]}}
+            emit('new-messages-to-front', result)
+        except:
+            result = { 'error': { 'type': 'message loading error', 'message': 'Something went wrong with loading the latest messages. Try reloading the webpage and loading the messages later!' } }
+            emit('new-messages-to-front', result)
     else:
-        offset = 0
-        if('offset' in req and req['offset'] != '0'):
-            offset = int(req['offset'])
-        messages = Message.query.order_by(Message.id.desc()).offset(offset).limit(10)
-        result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': msg.created.__str__() } for msg in messages ]}}
-        emit('old-messages-to-front', result)
+        try:
+            offset = 0
+            if('offset' in req and req['offset'] != '0'):
+                offset = int(req['offset'])
+            messages = Message.query.order_by(Message.id.desc()).offset(offset).limit(10)
+            result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': msg.created.__str__() } for msg in messages ]}}
+            emit('old-messages-to-front', result)
+        except:
+            result = { 'error': { 'type': 'message loading error', 'message': 'Something went wrong with loading the earlier messages. Try reloading the webpage and loading the messages later!' } }
+            emit('old-messages-to-front', result)
 
 @socketio.on('message-to-back')
 @logged_in_only
 def handle_message(req):
-    new_message = Message(content = req['message'], created = datetime.now(), user_id = session['user_id'])
-    db.session.add(new_message)
-    db.session.commit()
-    messages = Message.query.filter_by( user_id = session['user_id'] ).order_by( Message.id.desc() ).limit(1)
-    result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': msg.created.__str__() } for msg in messages ]}}
-    emit('message-to-front', result, broadcast = True)
+    try:
+        new_message = Message(content = req['message'], created = datetime.now(), user_id = session['user_id'])
+        db.session.add(new_message)
+        db.session.commit()
+        messages = Message.query.filter_by( user_id = session['user_id'] ).order_by( Message.id.desc() ).limit(1)
+        result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': msg.created.__str__() } for msg in messages ]}}
+        emit('message-to-front', result, broadcast = True)
+    except:
+        result = { 'error': { 'type': 'message sending error', 'message': 'Something went wrong with sending your message to the messge board. Try reloading the webpage and your message again later!' } }
+        emit('message-to-front', result)
 
 @socketio.on('disconnect')
 def handle_disconnect():

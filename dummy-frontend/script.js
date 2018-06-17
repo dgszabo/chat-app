@@ -20,10 +20,14 @@ $(document).ready(function(){
   })
 
   socket.on('logged-in', function(result) {
-    username = result.data.username;
-    console.log(username)
-    $("#messagesContainer").html("");
-    socket.emit('messages-request', { offset: msgCounter })
+    if(result.data) {
+      username = result.data.username;
+      console.log(username)
+      $("#messagesContainer").html("");
+      socket.emit('messages-request', { offset: msgCounter })
+    } else {
+      $("#messagesContainer").html(`<p>${result.error.message}</p>`);
+    }
   });
 
   socket.on('new-messages-to-front', function(result){
