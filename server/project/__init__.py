@@ -92,6 +92,18 @@ def handle_message(req):
         result = { 'error': { 'type': 'message sending error', 'message': 'Something went wrong with sending your message to the messge board. Try reloading the webpage and your message again later!' } }
         emit('message-to-front', result)
 
+@socketio.on('logout')
+@logged_in_only
+def handle_logout():
+    try:
+        user = User.query.get(session['user_id'])
+        user.last_login = datetime.now()
+        db.session.add(user)
+        db.session.commit()
+        session.clear()
+    except:
+        print('ERROR: Something went wrong when logging out the user.')
+
 @socketio.on('disconnect')
 def handle_disconnect():
     try:
