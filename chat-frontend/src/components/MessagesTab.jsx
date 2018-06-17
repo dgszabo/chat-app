@@ -13,7 +13,7 @@ const MessagesTab = ({ messages }) => {
             )
           } else {
             return (
-               <Message message={message} />
+               <Message key={message.id} message={message} />
             )
           }
         })}

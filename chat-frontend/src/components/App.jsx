@@ -77,20 +77,23 @@ class App extends Component {
       this.setState(prevState => {
         return { messages: [ ...prevState.messages, ...messages ] }
       });
-      console.log(this.state.messages);
     });
   }
 
-  loginSubmit(user) {
-    console.log(`You sent a login request as ${user.username}`);
-    this.socket.emit('login', { username: user.username });
+  loginSubmit(userObj) {
+    console.log(`You sent a login request as ${userObj.username}`);
+    this.socket.emit('login', { username: userObj.username });
+  }
+
+  sendMessage(msgObj) {
+    this.socket.emit('message-to-back', { message: msgObj.newMessage });
   }
 
   render() {
     let renderLoginOrChatWindow = () => {
       if(this.state.loggedIn) {
         return (
-          <ChatWindow messages={this.state.messages} />
+          <ChatWindow messages={this.state.messages} sendMessage={this.sendMessage.bind(this)} />
         )
       } else {
         return (

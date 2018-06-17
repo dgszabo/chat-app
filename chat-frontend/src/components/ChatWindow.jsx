@@ -8,7 +8,7 @@ class ChatWindow extends Component {
     return (
       <div className='container chatWindow'>
         <MessagesTab messages={this.props.messages} />
-        <SendMessageTab />
+        <SendMessageTab sendMessage={this.props.sendMessage} />
       </div>
     )
   }

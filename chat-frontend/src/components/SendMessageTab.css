@@ -26,18 +26,18 @@
     border-bottom-left-radius: 1px;
 }
 
-.sendMessageBox {
+.sendMessageForm {
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-.sendMessageBox input {
+.sendMessageForm input {
     padding: 2vh 2vw 4vh 2vw;
     width: 100%;
 }
 
-.sendMessageBox > button {
+.sendMessageForm > button {
     border-radius: 1px;
     height: 100%;
     padding-top: 3vh;
