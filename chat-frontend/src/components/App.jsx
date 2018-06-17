@@ -12,6 +12,7 @@ class App extends Component {
       connected: false,
       loggedIn: false,
       username: '',
+      messages: [],
     }
 
     // method binding
@@ -29,6 +30,7 @@ class App extends Component {
         connected: false,
         loggedIn: false,
         username: '',
+        messages: [],
       });
     });
 
@@ -44,6 +46,39 @@ class App extends Component {
         console.log(`An error has occured: ${result.error.message}`);
       }
     });
+
+    this.socket.on('old-messages-to-front', result => {
+      let messages = result.data.messages.map(el => {
+        el.date = new Date(el.date);
+        return el}
+      ).reverse();
+      this.setState(prevState => {
+        return { messages: [ ...prevState.messages, ...messages ] }
+      });
+      console.log(this.state.messages);
+    });
+
+    this.socket.on('new-messages-to-front', result => {
+      let messages = result.data.messages.map(el => {
+        el.date = new Date(el.date);
+        return el}
+      ).reverse();
+      this.setState(prevState => {
+        return { messages: [ ...messages ] }
+      });
+      console.log(this.state.messages);
+    });
+
+    this.socket.on('message-to-front', result => {
+      let messages = result.data.messages.map(el => {
+        el.date = new Date(el.date);
+        return el}
+      ).reverse();
+      this.setState(prevState => {
+        return { messages: [ ...prevState.messages, ...messages ] }
+      });
+      console.log(this.state.messages);
+    });
   }
 
   loginSubmit(user) {
@@ -55,7 +90,7 @@ class App extends Component {
     let renderLoginOrChatWindow = () => {
       if(this.state.loggedIn) {
         return (
-          <ChatWindow />
+          <ChatWindow messages={this.state.messages} />
         )
       } else {
         return (
