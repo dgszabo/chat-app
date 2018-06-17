@@ -1,11 +1,11 @@
 import React from 'react';
 import Message from './Message';
+import './MessagesTab.css'
 
 const MessagesTab = ({ messages }) => {
   return (
-    <div className="container mt-2 mx-auto">
-      <h3>Here are all your messages!</h3>
-      <ul className="list-group text-center">
+    <div className='container messagesTab mx-auto'>
+      <ul className='list-group text-center'>
         {messages.map((message) => {
           if(messages.length === 0) {
             return (

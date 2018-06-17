@@ -1,0 +1,46 @@
+.sendMessageTab {
+    width: 86vw;
+    position: fixed;
+    left: 7vw;
+    bottom: 0;
+    z-index: 50;
+}
+
+.btn-group {
+    width: 100%;
+}
+
+.btn-group > .btn {
+    width: 50%;
+}
+
+.btn-group > .btn:first-child {
+    border-top-right-radius: 1px;
+    border-bottom-right-radius: 1px;
+    border-bottom-left-radius: 1px;
+}
+
+.btn-group > .btn:last-child {
+    border-top-left-radius: 1px;
+    border-bottom-right-radius: 1px;
+    border-bottom-left-radius: 1px;
+}
+
+.sendMessageBox {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.sendMessageBox input {
+    padding: 2vh 2vw 4vh 2vw;
+    width: 100%;
+}
+
+.sendMessageBox > button {
+    border-radius: 1px;
+    height: 100%;
+    padding-top: 3vh;
+    padding-bottom: 3vh;
+    margin-right: 1px;
+}
