@@ -19,19 +19,18 @@ socketio = SocketIO(app)
 from . import models
 from project.models import User, Message
 
-@app.route('/login', methods = ['POST'])
-def login():
-    pass
-    # may need flask-login for this
-    # may have to add rolled auth wrapper instead of @login_required to the socketio routes
-    # read in the username from the form sent by JS
-    # if not in DB, add to DB, otherwise read from DB
-
-@socketio.on('connect')
-def handle_connect():
-    messages = Message.query.order_by( Message.id.desc() ).limit(10)[::-1]
-    result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': msg.created.__str__() } for msg in messages ]}}
-    emit('connected', result)
+@socketio.on('login')
+def handle_login(req):
+    user = User.query.filter(User.username == req).first()
+    if(not user):
+        new_user = User(username = req.username)
+        db.session.add(new_user)
+        db.session.commit()
+        user = User.query.filter(User.username == req).first()
+    session['user_id'] = user.id
+    session['username'] = user.username
+    result = { 'data': { 'username': session['username'] } }
+    emit('logged-in', result)
 
 @socketio.on('messages-request')
 def handle_messages_request(req, user):
@@ -60,10 +59,11 @@ def handle_message(msg, user):
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    user = User.query.get(1)
+    user = User.query.get(session['user_id'])
     user.last_login = datetime.now()
     db.session.add(user)
     db.session.commit()
+    session.clear()
 
 if __name__ == '__main__':
     socketio.run(app)

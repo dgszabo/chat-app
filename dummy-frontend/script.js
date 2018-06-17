@@ -1,11 +1,15 @@
 $(document).ready(function(){
   var socket = io.connect('http://localhost:5000');
+  var username;
+  var msgCounter = 0;
 
-  $('#login-btn').on('click', function() {
-    
-  });
-  
-  let msgCounter = 0;
+  $("#loginForm").on('submit', function(e){
+    e.preventDefault();
+    var user = $("#username").val();
+    socket.emit('login', user, function(){
+      $("#username").val("");
+    });
+  })
 
   $("#chatForm").on('submit', function(e){
     e.preventDefault();
@@ -16,29 +20,22 @@ $(document).ready(function(){
     });
   })
 
-  socket.on('connected', function(result){
-    result.data.messages = result.data.messages.map(el => {
-      el.date = new Date(el.date);
-      return el}
-    )
-    result.data.messages.map(el => {
-      $li = $('<li>').text(`${el.author} says ${el.content} on ${el.date}`);
-      $("#messagesContainer").append($li);
-    });
-    msgCounter = result.data.messages.length;
-  });
+  // socket.on('connected', function(result){
+  //   result.data.messages = result.data.messages.map(el => {
+  //     el.date = new Date(el.date);
+  //     return el}
+  //   )
+  //   result.data.messages.map(el => {
+  //     $li = $('<li>').text(`${el.author} says ${el.content} on ${el.date}`);
+  //     $("#messagesContainer").append($li);
+  //   });
+  //   msgCounter = result.data.messages.length;
+  // });
 
-  socket.on('new-messages-to-front', function(result){
-    result.data.messages = result.data.messages.map(el => {
-      el.date = new Date(el.date);
-      return el}
-    )
-    $("#messagesContainer").html("");
-    result.data.messages.map(el => {
-      $li = $('<li>').text(`${el.author} says ${el.content} on ${el.date}`);
-      $("#messagesContainer").append($li);
-    });
-    msgCounter = result.data.messages.length;
+  socket.on('logged-in', function(result) {
+    username = result.data.username;
+    console.log(username)
+    socket.emit('messages-request', { offset: msgCounter }, 'Jim')
   });
 
   socket.on('new-messages-to-front', function(result){
