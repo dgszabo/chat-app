@@ -50,7 +50,7 @@ def handle_login(req):
         result = { 'data': { 'username': session['username'] } }
         emit('logged-in', result)
     except:
-        result = { 'error': { 'type': 'login error', 'message': 'Something went wrong with logging you in to the chat app. Try reloading the webpage and logging in later!' } }
+        result = { 'error': { 'type': 'login error', 'message': 'something went wrong with logging you in to the chat app. try reloading the webpage and logging in later!' } }
         emit('logged-in', result)
 
 @socketio.on('messages-request')
@@ -64,7 +64,7 @@ def handle_messages_request(req):
             result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': msg.created.__str__() } for msg in messages ]}}
             emit('new-messages-to-front', result)
         except:
-            result = { 'error': { 'type': 'message loading error', 'message': 'Something went wrong with loading the latest messages. Try reloading the webpage and loading the messages later!' } }
+            result = { 'error': { 'type': 'message loading error', 'message': 'something went wrong with loading the latest messages. try reloading the webpage and loading the messages later!' } }
             emit('new-messages-to-front', result)
     else:
         try:
@@ -75,7 +75,7 @@ def handle_messages_request(req):
             result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': msg.created.__str__() } for msg in messages ]}}
             emit('old-messages-to-front', result)
         except:
-            result = { 'error': { 'type': 'message loading error', 'message': 'Something went wrong with loading the earlier messages. Try reloading the webpage and loading the messages later!' } }
+            result = { 'error': { 'type': 'message loading error', 'message': 'something went wrong with loading the earlier messages. try reloading the webpage and loading the messages later!' } }
             emit('old-messages-to-front', result)
 
 @socketio.on('message-to-back')
@@ -89,7 +89,7 @@ def handle_message(req):
         result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': msg.created.__str__() } for msg in messages ]}}
         emit('message-to-front', result, broadcast = True)
     except:
-        result = { 'error': { 'type': 'message sending error', 'message': 'Something went wrong with sending your message to the messge board. Try reloading the webpage and your message again later!' } }
+        result = { 'error': { 'type': 'message sending error', 'message': 'something went wrong with sending your message to the message board. try reloading the webpage and sending your message again later!' } }
         emit('message-to-front', result)
 
 @socketio.on('logout')
@@ -103,7 +103,7 @@ def handle_logout():
         session.clear()
         emit('logged-out')
     except:
-        result = { 'error': { 'type': 'logout error', 'message': 'Something went wrong with logging you out from the chat app. Try closing the webpage to disconnect or reloading the webpage to login again!' } }
+        result = { 'error': { 'type': 'logout error', 'message': 'something went wrong while logging you out from the chat app. try closing or reloading the webpage to login again!' } }
         emit('logged-out', result)
 
 @socketio.on('disconnect')

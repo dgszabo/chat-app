@@ -5,6 +5,7 @@ import DisconnectedWindow from './DisconnectedWindow'
 import LoginWindow from './LoginWindow'
 import ChatWindow from './ChatWindow'
 import Navbar from './Navbar'
+import ErrorMessage from './ErrorMessage';
 
 class App extends Component {
   constructor(props) {
@@ -14,6 +15,7 @@ class App extends Component {
       loggedIn: false,
       username: '',
       messages: [],
+      error: null,
     }
 
     // socketIO related code
@@ -34,7 +36,7 @@ class App extends Component {
 
     this.socket.on('logged-out', (result) => {
       if(result) {
-        console.log(result)
+        this.setState({ error: result.error });
       } else {
         this.setState({
           loggedIn: false,
@@ -52,38 +54,48 @@ class App extends Component {
         });
         this.socket.emit('messages-request', { offset: this.state.messages.length })
       } else {
-        console.log(`An error has occured: ${result.error.message}`);
+        this.setState({ error: result.error });
       }
     });
 
     this.socket.on('old-messages-to-front', result => {
-      let messages = result.data.messages.map(el => {
-        el.date = new Date(el.date);
-        return el}
-      ).reverse();
-      this.setState(prevState => {
-        return { messages: [ ...messages, ...prevState.messages ] }
-      });
+      if(result.data) {
+        let messages = result.data.messages.map(el => {
+          el.date = new Date(el.date);
+          return el}
+        ).reverse();
+        this.setState(prevState => {
+          return { messages: [ ...messages, ...prevState.messages ] }
+        });
+      } else {
+        this.setState({ error: result.error });
+      }
     });
 
     this.socket.on('new-messages-to-front', result => {
-      let messages = result.data.messages.map(el => {
-        el.date = new Date(el.date);
-        return el}
-      );
-      this.setState(prevState => {
-        return { messages: [ ...messages ] }
-      });
+      if(result.data) {
+        let messages = result.data.messages.map(el => {
+          el.date = new Date(el.date);
+          return el}
+        ).reverse();
+        this.setState({ messages: [ ...messages ] });
+      } else {
+        this.setState({ error: result.error });
+      }
     });
 
     this.socket.on('message-to-front', result => {
-      let messages = result.data.messages.map(el => {
-        el.date = new Date(el.date);
-        return el}
-      ).reverse();
-      this.setState(prevState => {
-        return { messages: [ ...prevState.messages, ...messages ] }
-      });
+      if(result.data) {
+        let messages = result.data.messages.map(el => {
+          el.date = new Date(el.date);
+          return el}
+        ).reverse();
+        this.setState(prevState => {
+          return { messages: [ ...prevState.messages, ...messages ] }
+        });
+      } else {
+        this.setState({ error: result.error });
+      }
     });
   }
 
@@ -103,6 +115,13 @@ class App extends Component {
     this.socket.emit('messages-request', { offset: this.state.messages.length });
   }
 
+  nilErrorMessage(event) {
+    event.preventDefault();
+    this.setState({
+      error: null,
+    })
+  }
+  
   logout(event) {
     event.preventDefault();
     this.socket.emit('logout');
@@ -139,6 +158,7 @@ class App extends Component {
     return (
       <div className='App'>
         {renderDisconnectedOrChatWindow()}
+        {this.state.error ? <ErrorMessage error={this.state.error} nilErrorMessage={this.nilErrorMessage.bind(this)} /> : ''}
       </div>
     );
   }
