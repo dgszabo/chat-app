@@ -60,7 +60,7 @@ def handle_messages_request(req):
     if('only_new' in req and req['only_new'] == True):
         try:
             last_login_time = User.query.get(session['user_id']).last_login
-            messages = Message.query.filter(Message.created > last_login_time).order_by(Message.id.desc())
+            messages = Message.query.filter(Message.created > last_login_time).order_by(Message.created.desc())
             result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': str(msg.created) } for msg in messages ]}}
             emit('new-messages-to-front', result)
         except:
@@ -71,7 +71,7 @@ def handle_messages_request(req):
             offset = 0
             if('offset' in req and req['offset'] != '0'):
                 offset = int(req['offset'])
-            messages = Message.query.order_by(Message.id.desc()).offset(offset).limit(10)
+            messages = Message.query.order_by(Message.created.desc()).offset(offset).limit(10)
             result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': str(msg.created) } for msg in messages ]}}
             emit('old-messages-to-front', result)
         except:
