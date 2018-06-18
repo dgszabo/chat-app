@@ -4,7 +4,7 @@ const Navbar = ({ username, logout }) => {
     return (
       <nav className="navbar fixed-top navbar-expand-lg navbar-dark bg-dark"	>
         <a className="navbar-brand" href="#">
-          <i className="fas fa-phone-volume"></i>
+          <i className="far fa-comments"></i>
           <span className='ml-1'>chat app</span>
         </a>
         <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
