@@ -5,10 +5,10 @@ const Message = ({ message }) => {
     <li className='list-group-item' >
         <div className='d-flex'>
             <span>
-                <h3 className='author'>@{message.author} says:</h3>
+                <h5 className='author'>@{message.author} says:</h5>
             </span>
             <span className='ml-auto my-auto'>
-                <h3>{`${message.date}`}</h3>
+                <h5>{`${message.date}`.split(' ').slice(0,-2).join(' ')}</h5>
             </span>
         </div>
         <div className='text-left'>

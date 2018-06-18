@@ -4,6 +4,7 @@ import socketIoClient from 'socket.io-client';
 import DisconnectedWindow from './DisconnectedWindow'
 import LoginWindow from './LoginWindow'
 import ChatWindow from './ChatWindow'
+import Navbar from './Navbar'
 
 class App extends Component {
   constructor(props) {
@@ -14,9 +15,6 @@ class App extends Component {
       username: '',
       messages: [],
     }
-
-    // method binding
-    this.loginSubmit = this.loginSubmit.bind(this);
 
     // socketIO related code
     this.socket = socketIoClient('localhost:5000')
@@ -32,6 +30,18 @@ class App extends Component {
         username: '',
         messages: [],
       });
+    });
+
+    this.socket.on('logged-out', (result) => {
+      if(result) {
+        console.log(result)
+      } else {
+        this.setState({
+          loggedIn: false,
+          username: '',
+          messages: [],
+        });
+      }
     });
 
     this.socket.on('logged-in', result => {
@@ -62,7 +72,7 @@ class App extends Component {
       let messages = result.data.messages.map(el => {
         el.date = new Date(el.date);
         return el}
-      ).reverse();
+      );
       this.setState(prevState => {
         return { messages: [ ...messages ] }
       });
@@ -97,15 +107,24 @@ class App extends Component {
     this.socket.emit('messages-request', { offset: this.state.messages.length });
   }
 
+  logout(event) {
+    event.preventDefault();
+    console.log('you pressed logout')
+    this.socket.emit('logout');
+  }
+
   render() {
     let renderLoginOrChatWindow = () => {
       if(this.state.loggedIn) {
         return (
-          <ChatWindow messages={this.state.messages} sendMessage={this.sendMessage.bind(this)} getNewMessages={this.getNewMessages.bind(this)} getOldMessages={this.getOldMessages.bind(this)} />
+          <div>
+            <Navbar username={this.state.username} logout={this.logout.bind(this)}/>
+            <ChatWindow messages={this.state.messages} sendMessage={this.sendMessage.bind(this)} getNewMessages={this.getNewMessages.bind(this)} getOldMessages={this.getOldMessages.bind(this)} />
+          </div>
         )
       } else {
         return (
-          <LoginWindow loginSubmit={this.loginSubmit} />
+          <LoginWindow loginSubmit={this.loginSubmit.bind(this)} />
         )
       }
     }
