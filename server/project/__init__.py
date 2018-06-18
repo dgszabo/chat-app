@@ -61,7 +61,7 @@ def handle_messages_request(req):
         try:
             last_login_time = User.query.get(session['user_id']).last_login
             messages = Message.query.filter(Message.created > last_login_time).order_by(Message.id.desc())
-            result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': msg.created.__str__() } for msg in messages ]}}
+            result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': str(msg.created) } for msg in messages ]}}
             emit('new-messages-to-front', result)
         except:
             result = { 'error': { 'type': 'message loading error', 'message': 'something went wrong with loading the latest messages. try reloading the webpage and loading the messages later!' } }
@@ -72,7 +72,7 @@ def handle_messages_request(req):
             if('offset' in req and req['offset'] != '0'):
                 offset = int(req['offset'])
             messages = Message.query.order_by(Message.id.desc()).offset(offset).limit(10)
-            result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': msg.created.__str__() } for msg in messages ]}}
+            result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': str(msg.created) } for msg in messages ]}}
             emit('old-messages-to-front', result)
         except:
             result = { 'error': { 'type': 'message loading error', 'message': 'something went wrong with loading the earlier messages. try reloading the webpage and loading the messages later!' } }
@@ -86,7 +86,7 @@ def handle_message(req):
         db.session.add(new_message)
         db.session.commit()
         messages = Message.query.filter_by( user_id = session['user_id'] ).order_by( Message.id.desc() ).limit(1)
-        result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': msg.created.__str__() } for msg in messages ]}}
+        result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': str(msg.created) } for msg in messages ]}}
         emit('message-to-front', result, broadcast = True)
     except:
         result = { 'error': { 'type': 'message sending error', 'message': 'something went wrong with sending your message to the message board. try reloading the webpage and sending your message again later!' } }
@@ -115,7 +115,7 @@ def handle_disconnect():
         db.session.commit()
         session.clear()
     except:
-        print('ERROR: No user was logged in when disconnecting.')
+        print('ERROR: Something went wrong while adding logout time to the database or no user was logged in when disconnecting.')
 
 @socketio.on_error_default
 def default_error_handler(error):
