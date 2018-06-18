@@ -33,12 +33,12 @@ flask run
 
 ### Frontend
 
-To setup the frontend react app, move to the chat-frontend folder in terminal. While in the root of the chat-frontend folder in terminal, type:
+To setup the frontend react app, move to the frontend folder in terminal. While in the root of the frontend folder in terminal, type:
 ```sh
 npm install
 ```
 
-To start the app, while in the root of the chat-frontend folder in terminal, type:
+To start the app, while in the root of the frontend folder in terminal, type:
 ```sh
 npm start
 ```
