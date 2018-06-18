@@ -60,7 +60,7 @@ def handle_messages_request(req):
     if('only_new' in req and req['only_new'] == True):
         try:
             last_login_time = User.query.get(session['user_id']).last_login
-            messages = Message.query.filter(Message.created > last_login_time)
+            messages = Message.query.filter(Message.created > last_login_time).order_by(Message.id.desc())
             result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': msg.created.__str__() } for msg in messages ]}}
             emit('new-messages-to-front', result)
         except:
