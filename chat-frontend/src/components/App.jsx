@@ -70,6 +70,11 @@ class App extends Component {
       } else {
         this.setState({ error: result.error });
       }
+      if(this.state.messages.length === 10) {
+        window.scrollTo(0, document.body.scrollHeight);
+      } else {
+        window.scrollTo(0, 0);
+      }
     });
 
     this.socket.on('new-messages-to-front', result => {
@@ -82,6 +87,7 @@ class App extends Component {
       } else {
         this.setState({ error: result.error });
       }
+      window.scrollTo(0, document.body.scrollHeight);
     });
 
     this.socket.on('message-to-front', result => {
@@ -96,6 +102,7 @@ class App extends Component {
       } else {
         this.setState({ error: result.error });
       }
+      window.scrollTo(0, document.body.scrollHeight);
     });
   }
 
