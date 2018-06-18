@@ -1,3 +1,4 @@
+# load modules, setup app and db configurations, and load models
 from flask import Flask, session
 import functools
 import os
@@ -26,7 +27,7 @@ socketio = SocketIO(app)
 
 from project.models import User, Message
 
-
+# decorator function to ensure that only logged in users can access certain routes
 def logged_in_only(func):
     @functools.wraps(func)
     def wrapped(*args, **kwargs):
@@ -36,6 +37,7 @@ def logged_in_only(func):
             return func(*args, **kwargs)
     return wrapped
 
+# socketIO routes
 @socketio.on('login')
 def handle_login(req):
     try:
@@ -60,7 +62,7 @@ def handle_messages_request(req):
     if('only_new' in req and req['only_new'] == True):
         try:
             last_login_time = User.query.get(session['user_id']).last_login
-            messages = Message.query.filter(Message.created > last_login_time).order_by(Message.created.desc())
+            messages = Message.query.filter(Message.created > last_login_time).order_by(Message.created.desc()).limit(10)
             result = { 'data': { 'messages': [{ 'id': msg.id, 'author': msg.user.username, 'content': msg.content, 'date': str(msg.created) } for msg in messages ]}}
             emit('new-messages-to-front', result)
         except:
@@ -117,6 +119,7 @@ def handle_disconnect():
     except:
         print('ERROR: Something went wrong while adding logout time to the database or no user was logged in when disconnecting.')
 
+# general socketIO error handling route
 @socketio.on_error_default
 def default_error_handler(error):
     print(f'The following error occured:\n{error}')
