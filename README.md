@@ -6,7 +6,7 @@ Installation, setup, and starting instructions
 
 - First, download the app files from this repo in zip or (fork and) clone the repo to your local machinne.
 
-###Server
+# Server
 
 - In order to run the server. you need to setup a virtual environment. If you have trouble setting up a vistual environment, see https://www.rithmschool.com/courses/flask-fundamentals/introduction-to-flask.
 - Next, install the dependencies of the Flask server. While in the root of the server folder in terminal, type:
@@ -30,7 +30,7 @@ export FLASK_APP=app.py
 flask run
 ```
 
-###Frontend
+# Frontend
 
 - To setup the frontend react app, move to the chat-frontend folder in terminal. While in the root of the chat-frontend folder in terminal, type:
 ```sh
