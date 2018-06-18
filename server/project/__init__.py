@@ -101,8 +101,10 @@ def handle_logout():
         db.session.add(user)
         db.session.commit()
         session.clear()
+        emit('logged-out')
     except:
-        print('ERROR: Something went wrong when logging out the user.')
+        result = { 'error': { 'type': 'logout error', 'message': 'Something went wrong with logging you out from the chat app. Try closing the webpage to disconnect or reloading the webpage to login again!' } }
+        emit('logged-out', result)
 
 @socketio.on('disconnect')
 def handle_disconnect():
