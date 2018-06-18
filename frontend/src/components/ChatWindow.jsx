@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import MessagesTab from './MessagesTab';
 import SendMessageTab from '../containers/SendMessageTab';
 import './ChatWindow.css'
