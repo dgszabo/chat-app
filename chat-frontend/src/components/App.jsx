@@ -50,7 +50,6 @@ class App extends Component {
           loggedIn: true,
           username: result.data.username,
         });
-        console.log('I emitted a request for messages')
         this.socket.emit('messages-request', { offset: this.state.messages.length })
       } else {
         console.log(`An error has occured: ${result.error.message}`);
@@ -65,7 +64,6 @@ class App extends Component {
       this.setState(prevState => {
         return { messages: [ ...messages, ...prevState.messages ] }
       });
-      console.log(this.state.messages);
     });
 
     this.socket.on('new-messages-to-front', result => {
@@ -76,7 +74,6 @@ class App extends Component {
       this.setState(prevState => {
         return { messages: [ ...messages ] }
       });
-      console.log(this.state.messages);
     });
 
     this.socket.on('message-to-front', result => {
@@ -91,7 +88,6 @@ class App extends Component {
   }
 
   loginSubmit(userObj) {
-    console.log(`You sent a login request as ${userObj.username}`);
     this.socket.emit('login', { username: userObj.username });
   }
 
@@ -109,7 +105,6 @@ class App extends Component {
 
   logout(event) {
     event.preventDefault();
-    console.log('you pressed logout')
     this.socket.emit('logout');
   }
 

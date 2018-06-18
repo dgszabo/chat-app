@@ -29,7 +29,7 @@ class LoginWindow extends Component {
               <input type='text' className='form-control' id='username' name='username' placeholder='provide a username' value={this.state.username} onChange={this.handleChange.bind(this)} required /> 
               <small id='usernameHelp' className='form-text text-muted pr-5'>you need to provide a username to log in to the app</small>
             </div>
-            <button type='submit' className='btn btn-secondary btn-block d-inline'>login</button>
+            <button type='submit' className='btn btn-info btn-block d-inline'>login</button>
           </form>
         </div>  
       </div>
