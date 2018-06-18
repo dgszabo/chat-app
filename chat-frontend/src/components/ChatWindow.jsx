@@ -1,17 +1,13 @@
 import React, { Component } from 'react';
 import MessagesTab from './MessagesTab';
-import SendMessageTab from './SendMessageTab';
+import SendMessageTab from '../containers/SendMessageTab';
 import './ChatWindow.css'
 
-class ChatWindow extends Component {
-  render () {
-    return (
-      <div className='container chatWindow'>
-        <MessagesTab messages={this.props.messages} />
-        <SendMessageTab sendMessage={this.props.sendMessage} getNewMessages={this.props.getNewMessages} getOldMessages={this.props.getOldMessages} />
-      </div>
-    )
-  }
-}
+const ChatWindow = ({ messages, sendMessage, getNewMessages, getOldMessages }) => (
+  <div className='container chatWindow'>
+    <MessagesTab messages={messages} />
+    <SendMessageTab sendMessage={sendMessage} getNewMessages={getNewMessages} getOldMessages={getOldMessages} />
+  </div>
+)
 
 export default ChatWindow;

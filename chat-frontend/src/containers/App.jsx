@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import './App.css';
 import socketIoClient from 'socket.io-client';
-import DisconnectedWindow from './DisconnectedWindow'
+import DisconnectedWindow from '../components/DisconnectedWindow'
 import LoginWindow from './LoginWindow'
-import ChatWindow from './ChatWindow'
-import Navbar from './Navbar'
-import ErrorMessage from './ErrorMessage';
+import ChatWindow from '../components/ChatWindow'
+import Navbar from '../components/Navbar'
+import ErrorMessage from '../components/ErrorMessage';
 
 class App extends Component {
   constructor(props) {
