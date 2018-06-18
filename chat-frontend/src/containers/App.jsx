@@ -18,7 +18,7 @@ class App extends Component {
       error: null,
     }
 
-    // socketIO related code
+    // socketIO related code - event listeners
     this.socket = socketIoClient('localhost:5000')
 
     this.socket.on('connect', () => {
@@ -106,6 +106,7 @@ class App extends Component {
     });
   }
 
+  // handler functions for events triggered in the children components
   loginSubmit(userObj) {
     this.socket.emit('login', { username: userObj.username });
   }
@@ -135,6 +136,7 @@ class App extends Component {
   }
 
   render() {
+    // logic related to which component to render based on react state
     let renderLoginOrChatWindow = () => {
       if(this.state.loggedIn) {
         return (
@@ -162,6 +164,7 @@ class App extends Component {
       }
     }
     
+    // rendering the app components
     return (
       <div className='App'>
         {renderDisconnectedOrChatWindow()}
